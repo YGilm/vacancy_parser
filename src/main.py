@@ -94,10 +94,25 @@ def main():
                 print("URL:", vacancy["url"])
                 print()
 
+        if filter_choice == "2":
+            if not vacancies:
+                print("Нет доступных вакансий для фильтрации.")
+                continue
+
+            print(f"Найдено {len(vacancies)} вакансий:\n")
+            for vacancy in vacancies:
+                print("Источник:", vacancy["source"])
+                print("Название:", vacancy["name"])
+                print("Город:", vacancy["city"])
+                print("Зарплата:", vacancy["salary"])
+                print("Требования:", vacancy["requirements"])
+                print("URL:", vacancy["url"])
+                print()
+
             while True:
                 print("1. Изменить параметры фильтра данных вакансий")
                 print("0. Выход")
-                filter_choice = input("Выберите действие: ")
+                filter_choice = input("Выберите действие: \n")
 
                 if filter_choice == "0":
                     exit("Благодарим за использование нашей программы!")

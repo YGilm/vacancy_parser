@@ -58,7 +58,7 @@ class SuperJobVacancy(SuperjobAPI):
                     item['town']['title']),
                 'salary': ("Зарплата не указана" if item['payment_from'] is None else (
                     item['payment_from'], item['payment_to'])),
-                'requirements': "Требования не указаны" if (
+                'requirements': "С требованиями можете ознакомиться по ссылке" if (
                         item['candidat'] is None or isinstance(item['candidat'], str)) else (
                     item['candidat'].get('professionalSkills', ["Не указаны"])[0]),
                 'url': item['link']
@@ -202,6 +202,10 @@ class VacancyList:
                     if vacancy['salary']['to'] is not None and int(vacancy['salary']['to']) > int(salary_to):
                         continue
             filtered_vacancies.append(vacancy)
+
+        if not filtered_vacancies:
+            print("По заданным параметрам фильтрации не найдено вакансий.")
+
         return filtered_vacancies
 
     @staticmethod
