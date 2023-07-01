@@ -2,8 +2,42 @@ import json
 from src.connector import HeadHunterAPI, SuperjobAPI
 
 
+class JsonHandler:
+    """Класс для работы с JSON-файлами."""
+
+    @staticmethod
+    def read_json(file_name):
+        """
+        Читает JSON-файл и возвращает данные.
+        Args:file_name (str): Имя файла.
+        Returns:dict: Данные из JSON-файла.
+        """
+        try:
+            with open(file_name, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            return data
+        except FileNotFoundError:
+            print("Файл не найден.")
+
+    @staticmethod
+    def write_json(file_name, data):
+        """Записывает данные в JSON-файл."""
+        with open(file_name, 'w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+
+    @staticmethod
+    def clear_file(file_name):
+        """Очищает содержимое файла."""
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.truncate(0)
+
+
 class HeadHunterVacancy(HeadHunterAPI):
     """Класс для получения вакансий с HeadHunterAPI."""
+
+    def __init__(self, keyword: str):
+        super().__init__(keyword)
+        self.json_handler = JsonHandler()
 
     @property
     def get_vacancy(self):
@@ -31,9 +65,9 @@ class HeadHunterVacancy(HeadHunterAPI):
         return list_vacancy
 
     def to_json(self):
-        """Сохраняет список вакансий в JSON-файл 'headhunter.json'."""
-        with open('headhunter.json', 'w', encoding='utf-8') as file:
-            json.dump(self.get_vacancy, file, ensure_ascii=False, indent=4)
+        """Очищает предыдущие записи и сохраняет список вакансий в JSON-файл 'headhunter.json'."""
+        self.json_handler.clear_file('headhunter.json')
+        self.json_handler.write_json('headhunter.json', self.get_vacancy)
 
 
 class SuperJobVacancy(SuperjobAPI):
@@ -67,9 +101,10 @@ class SuperJobVacancy(SuperjobAPI):
         return list_vacancy
 
     def to_json(self):
-        """Сохраняет список вакансий в JSON-файл 'superjob.json'."""
-        with open('superjob.json', 'w', encoding='utf-8') as file:
-            json.dump(self.get_vacancy, file, ensure_ascii=False, indent=4)
+        """Очищает предыдущие записи и сохраняет список вакансий в JSON-файл 'superjob.json'."""
+        data = self.get_vacancy
+        JsonHandler.clear_file('superjob.json')
+        JsonHandler.write_json('superjob.json', data)
 
 
 class CountMixin:
@@ -131,6 +166,21 @@ class Vacancy:
         self.salary_from = salary_from
         self.salary_to = salary_to
 
+    def __repr__(self):
+        """Возвращает строковое представление объекта Vacancy для отладки."""
+        class_name = self.__class__.__name__
+        return (
+            f"{class_name}(\n"
+            f"    Источник: {self.source}\n"
+            f"    Название: {self.name}\n"
+            f"    Ссылка: {self.url}\n"
+            f"    Город: {self.city}\n"
+            f"    Требования: {self.requirements}\n"
+            f"    Валюта: {self.currency}\n"
+            f"    Зарплата: {self.salary_from}-{self.salary_to}\n"
+            f")"
+        )
+
     def __str__(self):
         """Возвращает строковое представление объекта Vacancy."""
 
@@ -153,6 +203,14 @@ class VacancyList:
         """
         self.file_name = file_name
         self.vacancies = self.get_vacancy()
+
+    def __len__(self):
+        """Возвращает количество вакансий в списке."""
+        return len(self.vacancies)
+
+    def __contains__(self, item):
+        """Проверяет, содержит ли список указанную вакансию."""
+        return item in self.vacancies
 
     def get_vacancy(self):
         """
