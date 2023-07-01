@@ -18,7 +18,6 @@ class JsonHandler:
             return data
         except FileNotFoundError:
             print("Файл не найден.")
-            return {}
 
     @staticmethod
     def write_json(file_name, data):
@@ -167,6 +166,21 @@ class Vacancy:
         self.salary_from = salary_from
         self.salary_to = salary_to
 
+    def __repr__(self):
+        """Возвращает строковое представление объекта Vacancy для отладки."""
+        class_name = self.__class__.__name__
+        return (
+            f"{class_name}(\n"
+            f"    Источник: {self.source}\n"
+            f"    Название: {self.name}\n"
+            f"    Ссылка: {self.url}\n"
+            f"    Город: {self.city}\n"
+            f"    Требования: {self.requirements}\n"
+            f"    Валюта: {self.currency}\n"
+            f"    Зарплата: {self.salary_from}-{self.salary_to}\n"
+            f")"
+        )
+
     def __str__(self):
         """Возвращает строковое представление объекта Vacancy."""
 
@@ -189,6 +203,14 @@ class VacancyList:
         """
         self.file_name = file_name
         self.vacancies = self.get_vacancy()
+
+    def __len__(self):
+        """Возвращает количество вакансий в списке."""
+        return len(self.vacancies)
+
+    def __contains__(self, item):
+        """Проверяет, содержит ли список указанную вакансию."""
+        return item in self.vacancies
 
     def get_vacancy(self):
         """
